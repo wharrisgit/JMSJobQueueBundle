@@ -25,16 +25,11 @@ use JMS\JobQueueBundle\Exception\LogicException;
 use Symfony\Component\HttpKernel\Exception\FlattenException;
 
 /**
- * @ORM\Entity(repositoryClass = "JMS\JobQueueBundle\Entity\Repository\JobRepository")
- * @ORM\Table(name = "jms_jobs", indexes = {
- *     @ORM\Index(columns = {"command"}),
- *     @ORM\Index("job_runner", columns = {"executeAfter", "state"}),
- * })
- * @ORM\ChangeTrackingPolicy("DEFERRED_EXPLICIT")
+ * @ORM\MappedSuperclass
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class Job
+abstract class Job
 {
     /** State if job is inserted, but not yet ready to be started. */
     const STATE_NEW = 'new';
@@ -76,88 +71,62 @@ class Job
     const STATE_INCOMPLETE = 'incomplete';
 
     /** @ORM\Id @ORM\GeneratedValue(strategy = "AUTO") @ORM\Column(type = "bigint", options = {"unsigned": true}) */
-    private $id;
+    protected $id;
 
     /** @ORM\Column(type = "string") */
-    private $state;
+    protected $state;
 
     /** @ORM\Column(type = "datetime", name="createdAt") */
-    private $createdAt;
+    protected $createdAt;
 
     /** @ORM\Column(type = "datetime", name="startedAt", nullable = true) */
-    private $startedAt;
+    protected $startedAt;
 
     /** @ORM\Column(type = "datetime", name="checkedAt", nullable = true) */
-    private $checkedAt;
+    protected $checkedAt;
 
     /** @ORM\Column(type = "datetime", name="executeAfter", nullable = true) */
-    private $executeAfter;
+    protected $executeAfter;
 
     /** @ORM\Column(type = "datetime", name="closedAt", nullable = true) */
-    private $closedAt;
+    protected $closedAt;
 
     /** @ORM\Column(type = "string") */
-    private $command;
+    protected $command;
 
     /** @ORM\Column(type = "json_array") */
-    private $args;
-
-    /**
-     * @ORM\ManyToMany(targetEntity = "Job", fetch = "EAGER")
-     * @ORM\JoinTable(name="jms_job_dependencies",
-     *     joinColumns = { @ORM\JoinColumn(name = "source_job_id", referencedColumnName = "id") },
-     *     inverseJoinColumns = { @ORM\JoinColumn(name = "dest_job_id", referencedColumnName = "id")}
-     * )
-     */
-    private $dependencies;
+    protected $args;
 
     /** @ORM\Column(type = "text", nullable = true) */
-    private $output;
+    protected $output;
 
     /** @ORM\Column(type = "text", name="errorOutput", nullable = true) */
-    private $errorOutput;
+    protected $errorOutput;
 
     /** @ORM\Column(type = "smallint", name="exitCode", nullable = true, options = {"unsigned": true}) */
-    private $exitCode;
+    protected $exitCode;
 
     /** @ORM\Column(type = "smallint", name="maxRuntime", options = {"unsigned": true}) */
-    private $maxRuntime = 0;
+    protected $maxRuntime = 0;
 
     /** @ORM\Column(type = "smallint", name="maxRetries", options = {"unsigned": true}) */
-    private $maxRetries = 0;
-
-    /**
-     * @ORM\ManyToOne(targetEntity = "Job", inversedBy = "retryJobs")
-     * @ORM\JoinColumn(name="originalJob_id", referencedColumnName="id")
-     */
-    private $originalJob;
-
-    /** @ORM\OneToMany(targetEntity = "Job", mappedBy = "originalJob", cascade = {"persist", "remove", "detach"}) */
-    private $retryJobs;
+    protected $maxRetries = 0;
 
     /** @ORM\Column(type = "jms_job_safe_object", name="stackTrace", nullable = true) */
-    private $stackTrace;
+    protected $stackTrace;
 
     /** @ORM\Column(type = "smallint", nullable = true, options = {"unsigned": true}) */
-    private $runtime;
+    protected $runtime;
 
     /** @ORM\Column(type = "integer", name="memoryUsage", nullable = true, options = {"unsigned": true}) */
-    private $memoryUsage;
+    protected $memoryUsage;
 
     /** @ORM\Column(type = "integer", name="memoryUsageReal", nullable = true, options = {"unsigned": true}) */
-    private $memoryUsageReal;
-
-    /**
-     * This may store any entities which are related to this job, and are
-     * managed by Doctrine.
-     *
-     * It is effectively a many-to-any association.
-     */
-    private $relatedEntities;
+    protected $memoryUsageReal;
 
     public static function create($command, array $args = array(), $confirmed = true)
     {
-        return new self($command, $args, $confirmed);
+        return new static($command, $args, $confirmed);
     }
 
     public static function isNonSuccessfulFinalState($state)
@@ -564,7 +533,7 @@ class Job
         return sprintf('Job(id = %s, command = "%s")', $this->id, $this->command);
     }
 
-    private function mightHaveStarted()
+    protected function mightHaveStarted()
     {
         if (null === $this->id) {
             return false;

@@ -4,7 +4,7 @@ namespace JMS\JobQueueBundle\Controller;
 
 use Doctrine\Common\Util\ClassUtils;
 use JMS\DiExtraBundle\Annotation as DI;
-use JMS\JobQueueBundle\Entity\Job;
+use RentJeeves\DataBundle\Entity\Job;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\View\TwitterBootstrapView;
@@ -36,7 +36,7 @@ class JobController
         $lastJobsWithError = $this->getRepo()->findLastJobsWithError(5);
 
         $qb = $this->getEm()->createQueryBuilder();
-        $qb->select('j')->from('JMSJobQueueBundle:Job', 'j')
+        $qb->select('j')->from('RentJeeves\DataBundle\Entity\Job', 'j')
                 ->where($qb->expr()->isNull('j.originalJob'))
                 ->orderBy('j.id', 'desc');
 
@@ -82,7 +82,7 @@ class JobController
         $statisticData = $statisticOptions = array();
         if ($this->statisticsEnabled) {
             $dataPerCharacteristic = array();
-            foreach ($this->registry->getManagerForClass('JMSJobQueueBundle:Job')->getConnection()->query("SELECT * FROM jms_job_statistics WHERE job_id = ".$job->getId()) as $row) {
+            foreach ($this->registry->getManagerForClass('RentJeeves\DataBundle\Entity\Job')->getConnection()->query("SELECT * FROM jms_job_statistics WHERE job_id = ".$job->getId()) as $row) {
                 $dataPerCharacteristic[$row['characteristic']][] = array(
                     $row['createdAt'],
                     $row['charValue'],
@@ -174,12 +174,12 @@ class JobController
     /** @return \Doctrine\ORM\EntityManager */
     private function getEm()
     {
-        return $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
+        return $this->registry->getManagerForClass('RentJeeves\DataBundle\Entity\Job');
     }
 
-    /** @return \JMS\JobQueueBundle\Entity\Repository\JobRepository */
+    /** @return \RentJeeves\DataBundle\Entity\JobRepository */
     private function getRepo()
     {
-        return $this->getEm()->getRepository('JMSJobQueueBundle:Job');
+        return $this->getEm()->getRepository('RentJeeves\DataBundle\Entity\Job');
     }
 }

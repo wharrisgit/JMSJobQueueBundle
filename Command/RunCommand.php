@@ -282,11 +282,11 @@ class RunCommand extends \Symfony\Bundle\FrameworkBundle\Command\ContainerAwareC
 
     private function getEntityManager()
     {
-        return $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
+        return $this->registry->getManagerForClass('RjDataBundle:Job');
     }
 
     private function getRepository()
     {
-        return $this->getEntityManager()->getRepository('JMSJobQueueBundle:Job');
+        return $this->getEntityManager()->getRepository('RjDataBundle:Job');
     }
 }

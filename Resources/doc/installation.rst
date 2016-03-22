@@ -87,6 +87,20 @@ Then, update your dependencies using
 
     php composer.phar update
 
+And add the JMSDiExtraBundle and JMSAopBundle to your appKernel.php:
+
+.. code-block :: php
+    
+    <?php
+
+    // in AppKernel::registerBundles()
+    $bundles = array(
+        // ...
+        new JMS\DiExtraBundle\JMSDiExtraBundle($this),
+        new JMS\AopBundle\JMSAopBundle(),
+        // ...
+    );
+
 Typically, you would also want to add some access control restrictions for these
 actions. If you are using ``JMSSecurityExtraBundle`` this could look like this:
 
@@ -101,11 +115,10 @@ any action from this bundle.
 
 Setting Up supervisord
 ======================
-For this bundle to work, you have to make sure that one (and only one)
-instance of the console command ``jms-job-queue:run`` is running at all
-times. You can easily achieve this by using supervisord_.
+For this bundle to work, make sure that you run at least one instance of the console command ``jms-job-queue:run``
+(you can run as many as needed to process your events or guarantee high availability).
 
-A sample supervisord config might look like this:
+Below, is a sample configuration that you can use with supervisord:
 
 .. code-block :: ini
 

@@ -28,7 +28,7 @@ use JMS\JobQueueBundle\Exception\InvalidArgumentException;
 use JMS\JobQueueBundle\Event\NewOutputEvent;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\Process;
-use JMS\JobQueueBundle\Entity\Job;
+use RentJeeves\DataBundle\Entity\Job;
 use JMS\JobQueueBundle\Event\StateChangeEvent;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;

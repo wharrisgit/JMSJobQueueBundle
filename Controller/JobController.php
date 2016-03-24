@@ -29,7 +29,7 @@ class JobController
 
     /**
      * @Route("/", name = "jms_jobs_overview")
-     * @Template
+     * @Template("JMSJobQueueBundle:Job:overview.html.twig")
      */
     public function overviewAction()
     {
@@ -65,7 +65,7 @@ class JobController
 
     /**
      * @Route("/{id}", name = "jms_jobs_details")
-     * @Template
+     * @Template("JMSJobQueueBundle:Job:details.html.twig")
      */
     public function detailsAction(Job $job)
     {
@@ -84,8 +84,9 @@ class JobController
             $dataPerCharacteristic = array();
             foreach ($this->registry->getManagerForClass('RentJeeves\DataBundle\Entity\Job')->getConnection()->query("SELECT * FROM jms_job_statistics WHERE job_id = ".$job->getId()) as $row) {
                 $dataPerCharacteristic[$row['characteristic']][] = array(
-                    $row['createdAt'],
-                    $row['charValue'],
+                    // hack because postgresql lower-cases all column names.
+                    array_key_exists('createdAt', $row) ? $row['createdAt'] : $row['createdat'],
+                    array_key_exists('charValue', $row) ? $row['charValue'] : $row['charvalue'],
                 );
             }
 

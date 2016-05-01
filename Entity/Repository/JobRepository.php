@@ -317,7 +317,7 @@ class JobRepository extends EntityRepository
             case Job::STATE_TERMINATED:
             case Job::STATE_INCOMPLETE:
                 if ($job->isRetryJob()) {
-                    $job->setState($finalState);
+                    $job->setState($finalState, true);
                     $this->_em->persist($job);
 
                     $this->closeJobInternal($job->getOriginalJob(), $finalState);
@@ -360,7 +360,7 @@ class JobRepository extends EntityRepository
 
             case Job::STATE_FINISHED:
                 if ($job->isRetryJob()) {
-                    $job->getOriginalJob()->setState($finalState);
+                    $job->getOriginalJob()->setState($finalState, true);
                     $this->_em->persist($job->getOriginalJob());
                 }
                 $job->setState($finalState);
